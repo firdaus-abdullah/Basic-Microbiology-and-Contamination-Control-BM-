@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mikrobiologi Asas &amp; Kawalan Pencemaran</title>
+<style>
+  :root{
+    --ink:#0f172a;
+    --muted:#475569;
+    --brand:#1e3a8a;
+    --brand2:#059669;
+    --line:#e2e8f0;
+    --soft:#eff6ff;
+    --soft2:#ecfdf5;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    height:100%;
+    background:#ffffff;
+    overflow:hidden;
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;
+  }
+
+  #stage{position:fixed;inset:0;background:#fff}
+  #deck{
+    position:absolute;
+    left:50%;top:50%;
+    width:1600px;height:900px;
+    transform:translate(-50%,-50%) scale(1);
+    transform-origin:center center;
+    will-change:transform;
+  }
+
+  .slide{
+    position:absolute;inset:0;
+    padding:62px 84px 76px;
+    display:flex;flex-direction:column;
+    opacity:0;visibility:hidden;
+    transition:opacity .32s ease;
+    background:#fff;
+  }
+  .slide.active{opacity:1;visibility:visible}
+
+  .slide-logo{
+    position:absolute;
+    top:24px;right:48px;
+    height:80px;
+    width:auto;
+    max-width:210px;
+    object-fit:contain;
+    z-index:10;
+  }
+  .cover-logo{
+    position:static;
+    height:132px;
+    max-width:290px;
+    margin-bottom:34px;
+    display:block;
+  }
+
+  .kicker{
+    font-size:24px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--brand);margin-bottom:14px;
+  }
+  h1.title{
+    font-size:58px;line-height:1.12;font-weight:800;letter-spacing:-.015em;
+    max-width:1290px;
+  }
+  h1.title-xl{font-size:88px;line-height:1.06;font-weight:800;letter-spacing:-.025em}
+  .rule{width:130px;height:8px;border-radius:4px;background:var(--brand);margin:24px 0 0}
+  .lede{font-size:36px;color:var(--muted);line-height:1.4;margin-top:22px}
+  .body{flex:1;margin-top:36px;display:flex;flex-direction:column;justify-content:flex-start;position:relative;z-index:1}
+
+  .watermark{
+    position:absolute;right:40px;bottom:40px;
+    width:300px;height:300px;
+    opacity:.14;pointer-events:none;
+  }
+
+  .cover{justify-content:center;padding:70px 84px}
+  .cover-grid{
+    display:grid;grid-template-columns:1.3fr .7fr;gap:34px;align-items:center;width:100%;
+  }
+  .cover h1{font-size:76px;line-height:1.1;letter-spacing:-.025em;font-weight:800}
+  .cover .author{
+    margin-top:38px;
+    font-size:28px;font-weight:700;color:var(--brand);
+  }
+  .cover .author span{font-weight:600;color:var(--muted)}
+  .cover-art{width:100%;height:auto;max-height:540px;display:block}
+
+  ul.big,ol.num,ul.check{list-style:none;display:grid;gap:20px}
+  ul.big li{
+    position:relative;padding-left:46px;font-size:34px;line-height:1.38;
+  }
+  ul.big li::before{
+    content:"";position:absolute;left:6px;top:19px;
+    width:18px;height:18px;border-radius:5px;background:var(--brand);
+  }
+  ul.big li b{font-weight:800}
+
+  ol.num li,ul.check li{
+    display:flex;gap:24px;align-items:flex-start;
+    font-size:34px;line-height:1.38;
+  }
+  .n{
+    flex:0 0 54px;height:54px;border-radius:50%;
+    background:var(--brand);color:#fff;
+    display:grid;place-items:center;
+    font-size:25px;font-weight:800;margin-top:2px;
+  }
+  .n.alt{background:var(--brand2)}
+  .box{
+    flex:0 0 40px;height:40px;border:3px solid var(--brand);
+    border-radius:9px;margin-top:6px;
+  }
+
+  .callout{
+    background:var(--soft);
+    border-left:12px solid var(--brand);
+    border-radius:16px;
+    padding:26px 34px;
+    font-size:32px;line-height:1.38;font-weight:600;
+  }
+  .callout.green{background:var(--soft2);border-left-color:var(--brand2)}
+  .callout .lbl{
+    display:block;font-size:21px;font-weight:800;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--brand);margin-bottom:8px;
+  }
+  .callout.green .lbl{color:var(--brand2)}
+
+  .grid{display:grid;gap:26px}
+  .g2{grid-template-columns:1fr 1fr}
+  .g3{grid-template-columns:repeat(3,1fr)}
+  .card{
+    border:3px solid var(--line);border-radius:20px;
+    padding:26px 28px;background:#fff;
+    transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+  .card:hover{transform:translateY(-4px);box-shadow:0 14px 30px rgba(15,23,42,.10);border-color:#cbd5e1}
+  .card h3{font-size:31px;font-weight:800;color:var(--brand);margin-bottom:10px;line-height:1.2}
+  .card h3.teal{color:var(--brand2)}
+  .card p{font-size:27px;color:var(--muted);line-height:1.36}
+  .card ul{list-style:none;display:grid;gap:9px;margin-top:6px}
+  .card ul li{font-size:26px;color:var(--muted);line-height:1.32;padding-left:26px;position:relative}
+  .card ul li::before{
+    content:"";position:absolute;left:0;top:12px;width:12px;height:12px;
+    border-radius:3px;background:var(--brand);
+  }
+  .ico{
+    width:46px;height:46px;display:block;margin-bottom:12px;
+    fill:none;stroke:currentColor;stroke-width:3;
+    stroke-linecap:round;stroke-linejoin:round;color:var(--brand);
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:31px}
+  th{
+    text-align:left;font-size:22px;font-weight:800;letter-spacing:.13em;
+    text-transform:uppercase;color:var(--brand);
+    padding:0 22px 16px;border-bottom:5px solid var(--brand);
+  }
+  td{padding:19px 22px;border-bottom:2px solid var(--line);vertical-align:top;line-height:1.3}
+  td:first-child{font-weight:700}
+  tr:last-child td{border-bottom:none}
+
+  .dense .body{margin-top:26px}
+  .dense table{font-size:25px}
+  .dense th{font-size:19px;padding:0 18px 11px}
+  .dense td{padding:12px 18px}
+  .dense .callout{font-size:26px;padding:20px 28px;margin-top:22px}
+  .dense .callout .lbl{font-size:18px;margin-bottom:6px}
+  .dense .grid{gap:22px}
+  .dense .card{padding:20px 24px}
+  .dense .card h3{font-size:27px;margin-bottom:8px}
+  .dense .card p{font-size:23px}
+  .dense .card ul{gap:7px}
+  .dense .card ul li{font-size:22px;padding-left:24px}
+  .dense .card ul li::before{top:10px;width:10px;height:10px}
+
+  .chain{display:flex;align-items:stretch;gap:0;margin-top:10px}
+  .chain .node{
+    flex:1;display:grid;place-items:center;text-align:center;
+    border:3px solid var(--brand);border-radius:18px;
+    padding:22px 14px;font-size:26px;font-weight:700;line-height:1.28;
+    color:var(--brand);background:var(--soft);
+  }
+  .chain .arrow{
+    flex:0 0 56px;display:grid;place-items:center;
+    font-size:38px;color:#94a3b8;font-weight:700;
+  }
+
+  .airflow{width:100%;max-height:190px;display:block;margin-top:14px}
+
+  .huge{font-size:118px;font-weight:800;letter-spacing:-.03em;color:var(--brand);line-height:1}
+  .statement{font-size:52px;font-weight:800;line-height:1.16;letter-spacing:-.015em}
+  .tri{width:640px;max-width:100%;height:auto;display:block;margin:34px auto 0}
+
+  .footer-note{
+    margin-top:auto;padding-top:26px;
+    font-size:26px;color:#94a3b8;font-weight:600;
+  }
+
+  .summary-grid{display:grid;grid-template-columns:1fr 380px;gap:46px;align-items:start}
+  .num.compact li{font-size:30px;gap:20px}
+  .num.compact .n{flex:0 0 46px;height:46px;font-size:21px}
+  .qr-card{
+    border:3px solid var(--line);border-radius:20px;padding:24px;
+    text-align:center;background:var(--soft);
+  }
+  .qr{width:100%;max-width:290px;height:auto;display:block;margin:0 auto;
+      background:#fff;border-radius:12px;}
+  .qr-cap{margin-top:16px;font-size:23px;font-weight:700;color:var(--brand);line-height:1.3}
+
+  .closing-ico{width:120px;height:120px;display:block;margin:0 auto 30px}
+  .close-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center}
+  .close-wrap .rule{margin-left:auto;margin-right:auto}
+  .close-meta{display:flex;gap:16px;margin-top:40px;flex-wrap:wrap;justify-content:center}
+  .close-meta span{
+    font-size:24px;font-weight:600;color:var(--brand);
+    background:var(--soft);border-radius:999px;padding:12px 26px;
+  }
+
+  #bar{
+    position:fixed;left:0;bottom:0;height:8px;width:0;
+    background:linear-gradient(90deg,var(--brand),var(--brand2));
+    transition:width .3s ease;z-index:50;
+  }
+  #counter{
+    position:fixed;right:26px;bottom:26px;z-index:60;
+    font-size:22px;font-weight:700;color:#94a3b8;
+    letter-spacing:.08em;font-variant-numeric:tabular-nums;
+    user-select:none;
+  }
+  #fs{
+    position:fixed;left:24px;bottom:24px;z-index:60;
+    width:56px;height:56px;border-radius:15px;
+    border:3px solid var(--line);background:#fff;color:var(--brand);
+    display:grid;place-items:center;cursor:pointer;
+    opacity:.5;transition:opacity .2s,border-color .2s;
+  }
+  #fs:hover{opacity:1;border-color:var(--brand)}
+
+  #nav{
+    position:fixed;left:50%;bottom:20px;transform:translateX(-50%);
+    z-index:60;display:flex;gap:12px;align-items:center;
+  }
+  .navbtn{
+    width:58px;height:58px;border-radius:16px;
+    border:3px solid var(--line);background:#fff;color:var(--brand);
+    display:grid;place-items:center;cursor:pointer;
+    opacity:.6;transition:opacity .2s,border-color .2s,transform .12s;
+    box-shadow:0 4px 14px rgba(15,23,42,.06);
+  }
+  .navbtn:hover{opacity:1;border-color:var(--brand);transform:translateY(-2px)}
+  .navbtn:active{transform:translateY(0)}
+  .navbtn svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;
+              stroke-linecap:round;stroke-linejoin:round}
+  .navbtn.wide{width:66px}
+
+  #hint{
+    position:fixed;left:50%;bottom:90px;transform:translateX(-50%);z-index:60;
+    font-size:19px;font-weight:700;color:#94a3b8;letter-spacing:.06em;
+    transition:opacity .6s ease;user-select:none;white-space:nowrap;
+  }
+  #hint.gone{opacity:0}
+
+  #overview{
+    position:absolute;inset:0;z-index:300;
+    background:rgba(255,255,255,.98);
+    display:none;flex-direction:column;
+    padding:44px 56px;
+  }
+  #overview.open{display:flex}
+  .ov-head{display:flex;align-items:baseline;gap:20px}
+  .ov-head h2{font-size:40px;font-weight:800;color:var(--brand);letter-spacing:-.02em}
+  .ov-head p{font-size:22px;color:var(--muted);font-weight:600}
+  #ovGrid{
+    display:grid;grid-template-columns:repeat(6,233px);gap:18px;
+    margin-top:28px;overflow:auto;padding-bottom:10px;
+  }
+  .thumb{
+    position:relative;width:233px;height:131px;padding:0;
+    border:3px solid var(--line);border-radius:12px;overflow:hidden;
+    background:#fff;cursor:pointer;
+    transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;
+  }
+  .thumb:hover{transform:translateY(-3px);border-color:var(--brand);
+               box-shadow:0 10px 22px rgba(15,23,42,.14)}
+  .thumb.on{border-color:var(--brand2);box-shadow:0 0 0 4px rgba(5,150,105,.18)}
+  .thumb-inner{
+    position:absolute;top:0;left:0;width:1600px;height:900px;
+    transform:scale(0.14563);transform-origin:top left;pointer-events:none;
+  }
+  .thumb-num{
+    position:absolute;left:8px;bottom:8px;
+    background:var(--brand);color:#fff;font-size:16px;font-weight:800;
+    border-radius:7px;padding:3px 9px;line-height:1.3;
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="deck">
+
+    <!-- 1 · COVER -->
+    <section class="slide cover active">
+      <div class="cover-grid">
+        <div>
+          <img class="slide-logo cover-logo"
+               src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10"
+               alt="Logo syarikat">
+          <h1>Mikrobiologi Asas &amp;<br>Kawalan Pencemaran</h1>
+          <div class="rule"></div>
+          <div class="author">Disediakan oleh: <span>Muhammad Firdaus Abdullah</span></div>
+        </div>
+
+        <div>
+          <svg class="cover-art" viewBox="0 0 560 560" aria-hidden="true">
+            <circle cx="290" cy="285" r="235" fill="#eff6ff"/>
+            <g transform="translate(200 300)">
+              <circle r="168" fill="#ffffff" stroke="#1e3a8a" stroke-width="10"/>
+              <circle r="140" fill="none" stroke="#dbeafe" stroke-width="6"/>
+              <circle cx="-58" cy="-52" r="30" fill="#059669" opacity=".8"/>
+              <circle cx="34" cy="-74" r="20" fill="#1e3a8a" opacity=".75"/>
+              <circle cx="74" cy="6" r="34" fill="#059669" opacity=".55"/>
+              <circle cx="-32" cy="58" r="16" fill="#1e3a8a" opacity=".65"/>
+              <circle cx="40" cy="86" r="24" fill="#059669" opacity=".7"/>
+              <circle cx="-90" cy="18" r="11" fill="#0f172a" opacity=".45"/>
+              <circle cx="98" cy="96" r="9" fill="#0f172a" opacity=".4"/>
+            </g>
+            <g transform="translate(410 130)">
+              <rect x="8" y="62" width="74" height="206" rx="20" fill="#ffffff"
+                    stroke="#1e3a8a" stroke-width="9"/>
+              <rect x="16" y="172" width="58" height="88" rx="14" fill="#059669" opacity=".6"/>
+              <rect x="24" y="32" width="42" height="34" rx="8" fill="#1e3a8a"/>
+              <rect x="6" y="12" width="78" height="24" rx="10" fill="#1e3a8a"/>
+            </g>
+            <circle cx="82" cy="120" r="8" fill="#059669" opacity=".45"/>
+            <circle cx="470" cy="430" r="10" fill="#1e3a8a" opacity=".3"/>
+            <circle cx="120" cy="492" r="6" fill="#1e3a8a" opacity=".25"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · OBJEKTIF -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Objektif pembelajaran</div>
+      <h1 class="title">Pada akhir sesi ini, anda akan dapat…</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ol class="num">
+          <li><span class="n">1</span><div>Terangkan mengapa kesterilan tidak dapat dipastikan hanya melalui ujian produk akhir</div></li>
+          <li><span class="n">2</span><div>Kenal pasti sumber utama pencemaran dalam Gred A/B</div></li>
+          <li><span class="n">3</span><div>Huraikan tujuan dan reka bentuk Simulasi Proses Aseptik (APS)</div></li>
+          <li><span class="n">4</span><div>Bezakan intervensi wujud, pembetulan dan kritikal</div></li>
+          <li><span class="n">5</span><div>Nyatakan kriteria penerimaan dan akibat kegagalan</div></li>
+          <li><span class="n">6</span><div>Aplikasikan prinsip kawalan pencemaran semasa larian APS anda yang seterusnya</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 3 · MENGAPA MIKROBIOLOGI PENTING -->
+    <section class="slide">
+      <svg class="watermark" viewBox="0 0 300 300" aria-hidden="true">
+        <circle cx="150" cy="150" r="138" fill="none" stroke="#1e3a8a" stroke-width="10"/>
+        <circle cx="150" cy="150" r="110" fill="none" stroke="#1e3a8a" stroke-width="5"/>
+        <circle cx="112" cy="118" r="22" fill="#1e3a8a"/>
+        <circle cx="188" cy="132" r="15" fill="#1e3a8a"/>
+        <circle cx="166" cy="196" r="26" fill="#1e3a8a"/>
+        <circle cx="108" cy="188" r="12" fill="#1e3a8a"/>
+      </svg>
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 1 · Mengapa mikrobiologi penting</div>
+      <h1 class="title">Kesterilan tidak boleh diuji ke dalam produk.</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="statement" style="margin-bottom:34px;color:var(--brand)">
+          Ia mesti dibina dalam — melalui kawalan pencemaran.
+        </div>
+        <ul class="big">
+          <li>Ujian kesterilan terhad secara statistik — ia hanya mengesan pencemaran melebihi ambang tertentu</li>
+          <li>Pemprosesan aseptik bergantung sepenuhnya pada <b>pencegahan</b>, bukan pengesanan</li>
+          <li>APS ialah mekanisme yang <b>membuktikan</b> pencegahan tersebut</li>
+        </ul>
+        <div class="callout" style="margin-top:34px">
+          <span class="lbl">Mesej utama</span>
+          Anda ialah langkah kawalan pencemaran paling kritikal di dalam bilik bersih.
+        </div>
+      </div>
+    </section>
+
+    <!-- 4 · DUA LALUAN -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 1 · Risiko relatif</div>
+      <h1 class="title">Dua laluan kepada produk steril</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="grid g2" style="gap:34px">
+          <div class="card">
+            <h3>Pensterilan terminal</h3>
+            <p style="margin-bottom:16px">Produk disterilkan di dalam bekas akhirnya. Dengan syarat biobeban dikawal, risiko unit tidak steril adalah <b>sangat rendah</b>.</p>
+            <ul>
+              <li>Teguh dan bertolak ansur terhadap hanyutan proses kecil</li>
+              <li>Kesterilan dipastikan oleh proses letal</li>
+            </ul>
+          </div>
+          <div class="card" style="border-color:var(--brand)">
+            <h3 style="color:#b91c1c">Pemprosesan aseptik</h3>
+            <p style="margin-bottom:16px">Semua komponen disterilkan secara berasingan dan dipasang secara aseptik. <b>Walaupun semuanya steril, teknik yang lemah boleh mencemarkan produk.</b></p>
+            <ul>
+              <li>Semakin manual prosesnya, semakin tinggi risikonya</li>
+              <li>Kesterilan hanya dipastikan oleh disiplin operator</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-note">Kesilapan manusia dan teknik aseptik yang lemah ialah punca akar utama pencemaran.</div>
+    </section>
+
+    <!-- 5 · MIKROORGANISMA -->
+    <section class="slide dense">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 2 · Mikrobiologi asas</div>
+      <h1 class="title">Mikroorganisma yang membimbangkan</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr><th>Kumpulan</th><th>Relevan dalam pemprosesan aseptik</th><th>Sumber lazim</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Bakteria Gram-positif</td>
+              <td><i>Staphylococcus</i>, <i>Micrococcus</i> — flora kulit, sering ditemui dalam EM</td>
+              <td>Operator: kulit, rambut, air liur</td>
+            </tr>
+            <tr>
+              <td>Bakteria Gram-negatif</td>
+              <td><i>Pseudomonas</i>, <i>Escherichia</i> — menunjukkan kegagalan kawalan kelembapan</td>
+              <td>Air, permukaan basah</td>
+            </tr>
+            <tr>
+              <td>Kulat / acuan</td>
+              <td><i>Aspergillus</i>, <i>Penicillium</i> — bawaan udara, subur dalam keadaan lembap</td>
+              <td>Udara, HVAC, kerosakan air</td>
+            </tr>
+            <tr>
+              <td>Penghasil endotoksin</td>
+              <td>Pirogenik — serpihan tidak berdaya hidup pun mendatangkan risiko kepada pesakit</td>
+              <td>Sistem air, bahan mentah</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="callout">
+          <span class="lbl">Peringatan</span>
+          Kokus Gram-positif daripada kulit manusia ialah pencemar paling biasa dalam pengisian aseptik.
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · RANTAIAN PENYEBARAN -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 2 · Penyebaran mikroba</div>
+      <h1 class="title">Mikroorganisma tidak berjalan — ia menunggang zarah</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <p style="font-size:34px;color:var(--muted);margin-bottom:44px;line-height:1.4">
+          Setiap sel kulit yang anda tanggal membawa mikroorganisma. Setiap pergerakan menghasilkan kepulan zarah.
+        </p>
+        <div class="chain">
+          <div class="node">Operator</div>
+          <div class="arrow">→</div>
+          <div class="node">Pelepasan zarah</div>
+          <div class="arrow">→</div>
+          <div class="node">Penyebaran bawaan udara</div>
+          <div class="arrow">→</div>
+          <div class="node">Pemendapan pada permukaan kritikal</div>
+          <div class="arrow">→</div>
+          <div class="node">Pencemaran produk</div>
+        </div>
+        <div class="callout green" style="margin-top:52px">
+          <span class="lbl">Mengapa ia penting</span>
+          Pemakaian gaun, pergerakan perlahan dan disiplin aliran udara searah bukan formaliti — ia memutuskan rantaian.
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · SUMBER PENCEMARAN -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 3 · Strategi kawalan pencemaran</div>
+      <h1 class="title">Sumber pencemaran</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="grid g3">
+          <div class="card">
+            <svg class="ico" viewBox="0 0 48 48"><circle cx="24" cy="15" r="8"/><path d="M9 41c0-8.3 6.7-14 15-14s15 5.7 15 14"/></svg>
+            <h3>Kakitangan</h3>
+            <p>Serpihan kulit, titisan pernafasan, rambut, barang kemas, kosmetik, pemakaian gaun yang lemah</p>
+          </div>
+          <div class="card">
+            <svg class="ico" viewBox="0 0 48 48"><path d="M5 17h21a7 7 0 1 0-7-7"/><path d="M5 25h29a7 7 0 1 1-7 7"/><path d="M5 33h15"/></svg>
+            <h3>Udara / HVAC</h3>
+            <p>Gelora akibat pergerakan pantas, pembukaan pintu, kehilangan perlindungan udara pertama</p>
+          </div>
+          <div class="card">
+            <svg class="ico" viewBox="0 0 48 48"><rect x="8" y="8" width="32" height="32" rx="5"/><path d="M16 24l6 6 11-13"/></svg>
+            <h3>Permukaan &amp; peralatan</h3>
+            <p>Sentuhan dengan permukaan tidak steril, penyahjangkitan tidak mencukupi, pemeluwapan</p>
+          </div>
+          <div class="card">
+            <svg class="ico" viewBox="0 0 48 48"><path d="M24 6l16 9v18l-16 9-16-9V15z"/><path d="M8 15l16 9 16-9"/><path d="M24 24v18"/></svg>
+            <h3>Bahan</h3>
+            <p>Pembungkusan primer rosak, penghalang steril terjejas</p>
+          </div>
+          <div class="card">
+            <svg class="ico" viewBox="0 0 48 48"><path d="M24 7c8 10 12 15.5 12 21a12 12 0 0 1-24 0c0-5.5 4-11 12-21z"/></svg>
+            <h3>Air / kelembapan</h3>
+            <p>Sisa pencucian, tumpahan, pemeluwapan dalam isolator dan RABS</p>
+          </div>
+          <div class="card" style="border-color:var(--brand);background:var(--soft)">
+            <svg class="ico" viewBox="0 0 48 48"><circle cx="24" cy="24" r="15"/><circle cx="24" cy="24" r="7"/><circle cx="24" cy="24" r="1.5" fill="currentColor"/></svg>
+            <h3>Tingkah laku manusia</h3>
+            <p style="color:var(--brand);font-weight:600">Pemboleh ubah terbesar — dan yang anda kawal</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8 · PERANAN ANDA -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 3 · Peranan anda</div>
+      <h1 class="title">CCS dilaksanakan di barisan pengisian — oleh anda</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="big">
+          <li><b>Kelayakan pemakaian gaun</b> bukan acara sekali sahaja — ia ialah demonstrasi kecekapan yang berterusan</li>
+          <li><b>Pemantauan persekitaran</b> mencerminkan tingkah laku anda di dalam bilik, bukan sekadar prestasi HVAC</li>
+          <li><b>Teknik intervensi</b> menentukan sama ada udara pertama terjejas</li>
+        </ul>
+        <div class="callout" style="margin-top:40px">
+          <span class="lbl">Ingat</span>
+          CCS bukan dokumen milik QA. Ia ialah satu set tingkah laku yang dilakukan oleh operator.
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 · LIMA PRINSIP -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 4 · Teknik aseptik</div>
+      <h1 class="title">Lima prinsip yang diuji ke atas anda</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ol class="num">
+          <li><span class="n">1</span><div><b>Jangan sekali-kali</b> biarkan apa-apa yang tidak steril menyentuh permukaan steril</div></li>
+          <li><span class="n">2</span><div><b>Lindungi udara pertama</b> — jangan ganggu laluan dari penapis ke zon kritikal</div></li>
+          <li><span class="n">3</span><div><b>Bergerak perlahan dan berhati-hati</b> — pergerakan pantas mengganggu aliran udara</div></li>
+          <li><span class="n">4</span><div><b>Minimumkan intervensi</b> — rancang setiap tindakan sebelum memasuki Gred A</div></li>
+          <li><span class="n">5</span><div><b>Kekalkan kesedaran spatial</b> — ketahui kedudukan tangan, lengan baju dan alat</div></li>
+        </ol>
+
+        <svg class="airflow" viewBox="0 0 1200 200" aria-hidden="true">
+          <rect x="30" y="6" width="1140" height="34" rx="9" fill="#1e3a8a"/>
+          <text x="600" y="30" text-anchor="middle" font-size="20" font-weight="800"
+                fill="#ffffff" letter-spacing="3">PENAPIS HEPA — UDARA PERTAMA</text>
+          <g stroke="#059669" stroke-width="7" stroke-linecap="round" fill="none">
+            <path d="M150 48v96"/><path d="M300 48v96"/><path d="M450 48v96"/>
+            <path d="M600 48v96"/><path d="M750 48v96"/><path d="M900 48v96"/>
+            <path d="M1050 48v96"/>
+          </g>
+          <g stroke="#059669" stroke-width="7" stroke-linecap="round"
+             stroke-linejoin="round" fill="none">
+            <path d="M136 130l14 16 14-16"/><path d="M286 130l14 16 14-16"/>
+            <path d="M436 130l14 16 14-16"/><path d="M586 130l14 16 14-16"/>
+            <path d="M736 130l14 16 14-16"/><path d="M886 130l14 16 14-16"/>
+            <path d="M1036 130l14 16 14-16"/>
+          </g>
+          <rect x="380" y="152" width="440" height="26" rx="10"
+                fill="#ecfdf5" stroke="#1e3a8a" stroke-width="5"/>
+          <text x="600" y="172" text-anchor="middle" font-size="18" font-weight="800"
+                fill="#1e3a8a" letter-spacing="2">ZON KRITIKAL</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 10 · PEMAKAIAN GAUN -->
+    <section class="slide">
+      <svg class="watermark" viewBox="0 0 300 380" aria-hidden="true">
+        <circle cx="150" cy="60" r="46" fill="none" stroke="#1e3a8a" stroke-width="9"/>
+        <path d="M105 108 Q150 92 195 108 L208 240 L196 240 L196 350 L104 350 L104 240 L92 240 Z"
+              fill="none" stroke="#1e3a8a" stroke-width="9" stroke-linejoin="round"/>
+        <line x1="150" y1="120" x2="150" y2="345" stroke="#1e3a8a" stroke-width="6" stroke-dasharray="12 12"/>
+        <circle cx="100" cy="255" r="18" fill="#1e3a8a"/>
+        <circle cx="200" cy="255" r="18" fill="#1e3a8a"/>
+      </svg>
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 4 · Penghalang pertama dan terakhir</div>
+      <h1 class="title">Pemakaian gaun ialah penghalang mikrobiologi</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="big">
+          <li>Jurang pada <b>antara muka sarung tangan–lengan baju</b> ialah laluan pencemaran langsung</li>
+          <li>Topeng yang tidak melekap dengan baik melepaskan <b>titisan pernafasan</b> ke Gred A</li>
+          <li>Hood yang mendedahkan rambut sentiasa melepaskan <b>zarah kulit dan rambut</b></li>
+          <li>Pensijilan pemakaian gaun mesti <b>terkini</b> sebelum anda memasuki teras aseptik</li>
+        </ul>
+        <div class="callout green" style="margin-top:40px">
+          <span class="lbl">Semakan kendiri sebelum setiap kemasukan</span>
+          Gaun utuh? Sarung tangan ketat? Topeng melekap? Barang kemas dan kosmetik ditanggalkan?
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 · APA ITU APS -->
+    <section class="slide dense">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 5 · Simulasi Proses Aseptik</div>
+      <h1 class="title">Apa itu APS — dan apa yang bukan APS</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="grid g2" style="gap:30px">
+          <div class="card" style="border-color:var(--brand2)">
+            <h3 class="teal">APS ialah…</h3>
+            <ul>
+              <li>Simulasi proses menggunakan media pertumbuhan sebagai ganti produk</li>
+              <li>Dilaksanakan dengan peralatan, prosedur, persekitaran dan kakitangan yang sama</li>
+              <li>Diinkubasi untuk mengesan pencemaran yang diperkenalkan semasa proses</li>
+              <li>Setara dengan, atau kes terburuk bagi, operasi aseptik rutin</li>
+            </ul>
+          </div>
+          <div class="card" style="border-color:#cbd5e1">
+            <h3 style="color:#b91c1c">APS bukan…</h3>
+            <ul>
+              <li>Pengganti pemantauan persekitaran</li>
+              <li>Latihan kelayakan sekali sahaja</li>
+              <li>Sesuatu yang boleh “diluluskan” dengan langkah berjaga-jaga tambahan</li>
+            </ul>
+          </div>
+        </div>
+        <div class="callout" style="margin-top:26px">
+          <span class="lbl">Kritikal</span>
+          Jika langkah berjaga-jaga tambahan diambil hanya untuk isian media, tujuan APS terbatal.
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 · KERANGKA KAWAL SELIA -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 5 · Kerangka kawal selia</div>
+      <h1 class="title">Peraturan yang mengawal APS</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr><th>Keperluan</th><th>Jangkaan</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Kelayakan awal</td><td>Minimum <b>tiga</b> larian APS berturut-turut yang berjaya</td></tr>
+            <tr><td>Kelayakan semula</td><td>Dua kali setahun bagi setiap barisan; setiap operator dikekalkan kelayakan sekurang-kurangnya <b>setiap tahun</b></td></tr>
+            <tr><td>Inkubasi</td><td>Minimum <b>14 hari</b>, suhu dwi (20–25 °C kemudian 30–35 °C)</td></tr>
+            <tr><td>Kriteria penerimaan</td><td><b>Sifar</b> unit tercemar</td></tr>
+            <tr><td>Pemeriksaan</td><td>Oleh kakitangan terlatih dan layak untuk mengesan pencemaran</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 13 · REKA BENTUK KES TERBURUK -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 5 · Reka bentuk kes terburuk</div>
+      <h1 class="title">Apa yang menjadi asas protokol APS</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="grid g3" style="gap:22px">
+          <div class="card" style="padding:22px 24px"><h3 style="font-size:27px">Intervensi</h3><p style="font-size:24px">Jenis, kekerapan, tempoh, bekas yang dikeluarkan</p></div>
+          <div class="card" style="padding:22px 24px"><h3 style="font-size:27px">Isipadu isian &amp; bekas</h3><p style="font-size:24px">Isipadu dan kelajuan barisan kes terburuk</p></div>
+          <div class="card" style="padding:22px 24px"><h3 style="font-size:27px">Tempoh larian</h3><p style="font-size:24px">Bilangan syif, termasuk pertukaran syif</p></div>
+          <div class="card" style="padding:22px 24px"><h3 style="font-size:27px">Kakitangan</h3><p style="font-size:24px">Bilangan maksimum dalam teras aseptik</p></div>
+          <div class="card" style="padding:22px 24px"><h3 style="font-size:27px">Masa tahan</h3><p style="font-size:24px">Masa pendedahan maksimum untuk bekas terbuka</p></div>
+          <div class="card" style="padding:22px 24px"><h3 style="font-size:27px">Persekitaran</h3><p style="font-size:24px">Mewakili operasi rutin</p></div>
+        </div>
+        <div class="callout" style="margin-top:30px;font-size:28px">
+          <span class="lbl">Implikasi kepada operator</span>
+          Protokol direka berdasarkan <i>intervensi rutin anda</i>. Jika anda melakukannya secara berbeza, simulasi menjadi tidak sah.
+        </div>
+      </div>
+    </section>
+
+    <!-- 14 · INTERVENSI -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 6 · Intervensi</div>
+      <h1 class="title">Tiga jenis — dan semuanya mesti disimulasikan</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="grid g3" style="gap:24px">
+          <div class="card">
+            <h3>Inheren</h3>
+            <p style="margin-bottom:12px">Aktiviti terancang dalam setiap larian.</p>
+            <ul>
+              <li>Penapisan dan pengisian</li>
+              <li>Pemuatan / pemunggahan liofilisator</li>
+              <li>Pengumpulan sampel rutin</li>
+            </ul>
+            <p style="margin-top:14px;font-size:24px">Disimulasikan pada <b>kekerapan dan tempoh yang sama</b> seperti pengeluaran.</p>
+          </div>
+          <div class="card">
+            <h3>Pembetulan</h3>
+            <p style="margin-bottom:12px">Operasi yang difahami dengan baik untuk membetulkan atau melaraskan proses.</p>
+            <ul>
+              <li>Pecah bekas</li>
+              <li>Penyekat tersangkut</li>
+              <li>Vial tumbang</li>
+              <li>Pelarasan peralatan</li>
+            </ul>
+            <p style="margin-top:14px;font-size:24px">Tidak terancang dalam pengeluaran — tetapi <b>sengaja dimasukkan</b> dalam APS.</p>
+          </div>
+          <div class="card" style="border-color:var(--brand)">
+            <h3>Kritikal</h3>
+            <p>Berlaku <b>dalam kawasan pemprosesan aseptik</b> di mana produk dan permukaan kritikal terdedah kepada persekitaran.</p>
+            <p style="margin-top:14px;color:var(--brand);font-weight:700">Risiko pencemaran tertinggi — perlindungan udara pertama maksimum diperlukan.</p>
+          </div>
+        </div>
+        <div class="callout green" style="margin-top:30px;font-size:30px">
+          <span class="lbl">Jangkaan kawal selia</span>
+          100 % daripada semua intervensi bukan rutin mesti disimulasikan — dari segi jenis, kekerapan dan tempoh.
+        </div>
+      </div>
+    </section>
+
+    <!-- 15 · AKAUNTABILITI -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 6 · Akauntabiliti operator</div>
+      <h1 class="title">Intervensi direkodkan — dan dikaitkan</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="big">
+          <li>Setiap intervensi semasa APS direkodkan dengan <b>masa mula dan tamat</b> serta <b>individu yang terlibat</b></li>
+          <li><b>Intervensi pembetulan baharu</b> yang belum pernah dimasukkan dalam program APS mesti dinilai sebelum pelepasan kelompok</li>
+          <li>Intervensi yang dilakukan dalam pengeluaran tetapi <b>tidak disimulasikan</b> ialah pemerhatian langsung dan akan mencetuskan tindakan kawal selia</li>
+        </ul>
+        <div class="callout" style="margin-top:38px">
+          <span class="lbl">Kegagalan audit biasa</span>
+          Intervensi yang diperhatikan dalam pembuatan tetapi disimulasikan pada kekerapan lebih rendah atau tempoh lebih pendek daripada yang sebenarnya dilakukan.
+        </div>
+      </div>
+    </section>
+
+    <!-- 16 · SEBELUM APS -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 7 · Sebelum APS</div>
+      <h1 class="title">Bersedia — jangan berimprovisasi</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="big">
+          <li>Sahkan <b>kelayakan pemakaian gaun anda terkini</b></li>
+          <li>Semak protokol — terutamanya <b>senarai intervensi</b> yang mesti anda lakukan</li>
+          <li>Sahkan anda <b>sihat untuk masuk</b>: tiada penyakit, tiada luka terbuka</li>
+          <li>Tanggalkan <b>semua kosmetik, minyak wangi dan barang kemas</b></li>
+          <li>Lakukan <b>latihan mental</b> intervensi sebelum anda masuk</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 17 · SEMASA APS -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 7 · Semasa APS</div>
+      <h1 class="title">Simulasikan realiti — tidak lebih, tidak kurang</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="big">
+          <li>Lakukan intervensi <b>tepat seperti dalam pengeluaran rutin</b></li>
+          <li><b>Jangan tambah</b> langkah berjaga-jaga atau masa tambahan</li>
+          <li><b>Umumkan dan dokumentasikan</b> setiap intervensi seperti yang dikehendaki protokol</li>
+          <li>Kekalkan <b>disiplin udara pertama</b> — terutamanya semasa intervensi pembetulan</li>
+          <li><b>Jangan cuba “melindungi” APS</b> — tangani masalah mengikut prosedur</li>
+          <li>Jika tidak pasti, <b>berhenti dan tanya penyelia</b></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 18 · SELEPAS APS -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 7 · Selepas APS</div>
+      <h1 class="title">Larian tidak berakhir apabila barisan berhenti</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="big">
+          <li>Semua unit terisi diinkubasi <b>tanpa kelewatan yang tidak perlu</b></li>
+          <li><b>Jangan keluarkan atau manipulasi</b> unit yang diinkubasi</li>
+          <li>Jika anda memeriksa unit, anda mesti <b>terlatih dan layak</b> untuk mengesan pencemaran</li>
+          <li>Sebarang <b>sisihan</b> semasa larian mesti didokumentasikan dan dinilai</li>
+        </ul>
+        <div class="callout green" style="margin-top:40px">
+          <span class="lbl">Peringatan</span>
+          Sisihan yang tidak didokumentasikan semasa APS itu sendiri ialah kegagalan simulasi.
+        </div>
+      </div>
+    </section>
+
+    <!-- 19 · KRITERIA PENERIMAAN -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 8 · Kriteria penerimaan</div>
+      <h1 class="title">Satu-satunya keputusan yang boleh diterima</h1>
+      <div class="rule"></div>
+      <div class="body" style="justify-content:center;align-items:center;text-align:center;margin-top:0">
+        <div class="huge">SIFAR</div>
+        <p style="font-size:42px;font-weight:700;margin-top:18px">unit tercemar</p>
+        <p style="font-size:30px;color:var(--muted);margin-top:24px;max-width:1050px;line-height:1.4">
+          Mana-mana unit tercemar bermaksud <b>APS gagal</b>. Bagi isian kurang daripada 5,000 unit, satu unit tercemar pun memerlukan pengesahan semula.
+        </p>
+
+        <svg class="tri" viewBox="0 0 600 180" aria-hidden="true">
+          <g transform="translate(110 90)">
+            <circle r="78" fill="#ecfdf5" stroke="#059669" stroke-width="8"/>
+            <circle r="58" fill="none" stroke="#a7f3d0" stroke-width="4"/>
+            <path d="M-26 0 L-6 22 L30 -22" fill="none" stroke="#059669" stroke-width="11"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g transform="translate(300 90)">
+            <circle r="78" fill="#ecfdf5" stroke="#059669" stroke-width="8"/>
+            <circle r="58" fill="none" stroke="#a7f3d0" stroke-width="4"/>
+            <path d="M-26 0 L-6 22 L30 -22" fill="none" stroke="#059669" stroke-width="11"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+          <g transform="translate(490 90)">
+            <circle r="78" fill="#ecfdf5" stroke="#059669" stroke-width="8"/>
+            <circle r="58" fill="none" stroke="#a7f3d0" stroke-width="4"/>
+            <path d="M-26 0 L-6 22 L30 -22" fill="none" stroke="#059669" stroke-width="11"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- 20 · AKIBAT -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 8 · Akibat</div>
+      <h1 class="title">Apa yang dicetuskan oleh satu unit tercemar</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ol class="num">
+          <li><span class="n">1</span><div><b>Siasatan punca akar</b> untuk menentukan punca paling mungkin</div></li>
+          <li><span class="n">2</span><div><b>Tindakan pembetulan dan pencegahan</b> (CAPA)</div></li>
+          <li><span class="n">3</span><div><b>Tiga larian APS berturut-turut yang berjaya</b> sebelum barisan kembali terkawal</div></li>
+          <li><span class="n">4</span><div><b>Semakan retrospektif</b> dan kuarantin semua kelompok sejak APS berjaya yang terakhir</div></li>
+          <li><span class="n">5</span><div>Jika berkaitan operator: <b>sekatan tugas</b> sehingga dilatih semula dan dilayakkan semula</div></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 21 · MOD KEGAGALAN -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 8 · Mod kegagalan</div>
+      <h1 class="title">Bagaimana larian APS gagal</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <table>
+          <thead>
+            <tr><th>Mod kegagalan</th><th>Punca akar lazim</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Berkaitan operator</td><td>Teknik lemah semasa intervensi, pelanggaran udara pertama, kegagalan pemakaian gaun</td></tr>
+            <tr><td>Simulasi tidak mencukupi</td><td>APS tidak mewakili keadaan kes terburuk rutin</td></tr>
+            <tr><td>Sisihan persekitaran</td><td>Isu HVAC atau fasiliti tidak dikesan oleh EM</td></tr>
+            <tr><td>Media / inkubasi</td><td>Kegagalan promosi pertumbuhan, keadaan inkubasi tidak betul</td></tr>
+            <tr><td>Pembatalan (bukan kegagalan)</td><td>Kegagalan mekanikal, sisihan protokol, kehilangan kuasa</td></tr>
+          </tbody>
+        </table>
+        <div class="callout" style="margin-top:30px;font-size:28px">
+          <span class="lbl">Nota</span>
+          APS boleh <b>dibatalkan</b> — tetapi pembatalan memerlukan siasatan dan dokumentasi. Ia bukan percubaan semula percuma.
+        </div>
+      </div>
+    </section>
+
+    <!-- 22 · SENARAI SEMAK -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Modul 9 · Merumuskan keseluruhan</div>
+      <h1 class="title">Senarai semak kawalan pencemaran peribadi anda</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <ul class="check">
+          <li><span class="box"></span><div>Pemakaian gaun saya utuh, terkedap dan layak</div></li>
+          <li><span class="box"></span><div>Semua barang kemas, kosmetik dan barangan peribadi ditanggalkan</div></li>
+          <li><span class="box"></span><div>Saya tahu intervensi yang mesti saya lakukan — dan telah berlatih</div></li>
+          <li><span class="box"></span><div>Saya bergerak perlahan dan berhati-hati</div></li>
+          <li><span class="box"></span><div>Saya melindungi udara pertama semasa setiap manipulasi</div></li>
+          <li><span class="box"></span><div>Saya melakukan intervensi tepat seperti dalam pengeluaran rutin</div></li>
+          <li><span class="box"></span><div>Jika sesuatu berlaku, saya mengikut prosedur dan mendokumentasikannya</div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 23 · RINGKASAN + QR -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="kicker">Ringkasan</div>
+      <h1 class="title">Lima perkara untuk diingat</h1>
+      <div class="rule"></div>
+      <div class="body">
+        <div class="summary-grid">
+          <ol class="num compact">
+            <li><span class="n">1</span><div>Kesterilan tidak boleh diuji masuk — <b>APS membuktikan proses itu mampu</b></div></li>
+            <li><span class="n">2</span><div>Operator ialah <b>sumber pencemaran utama dan kawalan utama</b></div></li>
+            <li><span class="n">3</span><div>APS mesti mencerminkan pengeluaran rutin — <b>100 % intervensi bukan rutin disimulasikan</b></div></li>
+            <li><span class="n">4</span><div><b>Sifar pertumbuhan</b> ialah satu-satunya keputusan yang boleh diterima</div></li>
+            <li><span class="n">5</span><div>Kawalan pencemaran ialah <b>tingkah laku</b>, bukan dokumen</div></li>
+          </ol>
+
+          <div class="qr-card">
+            <img class="qr"
+                 src="https://api.qrserver.com/v1/create-qr-code/?size=400x400&margin=8&data=https%3A%2F%2Fforms.gle%2FAPS-Refresher-Assessment"
+                 alt="Kod QR yang memaut ke penilaian">
+            <div class="qr-cap">Imbas untuk memulakan penilaian</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 24 · PENUTUP -->
+    <section class="slide">
+      <img class="slide-logo" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRXNcmxfNgNJtcBHBzyYf7S20E5bHQiHKVmjeYl6hXw1g&s=10" alt="">
+      <div class="close-wrap">
+        <svg class="closing-ico" viewBox="0 0 120 120" aria-hidden="true">
+          <path d="M60 10l38 14v30c0 26-16 44-38 52-22-8-38-26-38-52V24z"
+                fill="none" stroke="#1e3a8a" stroke-width="6" stroke-linejoin="round"/>
+          <path d="M42 60l14 14 24-26" fill="none" stroke="#059669" stroke-width="8"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1 class="title-xl" style="font-size:72px">Teknik anda ialah<br>jaminan kesterilan.</h1>
+        <div class="rule"></div>
+        <div class="close-meta">
+          <span>Soalan?</span>
+          <span>Tanya penyelia anda</span>
+          <span>Mikrobiologi QC</span>
+        </div>
+        <div style="margin-top:34px;font-size:24px;font-weight:700;color:var(--brand)">
+          Disediakan oleh: <span style="color:var(--muted);font-weight:600">Muhammad Firdaus Abdullah</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- GAMBARAN KESELURUHAN -->
+    <div id="overview" class="no-advance">
+      <div class="ov-head">
+        <h2>Gambaran keseluruhan slaid</h2>
+        <p>Klik slaid untuk lompat · tekan Esc untuk tutup</p>
+      </div>
+      <div id="ovGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="bar"></div>
+<div id="counter">1 / 24</div>
+
+<button id="fs" class="no-advance" aria-label="Tukar skrin penuh" title="Skrin penuh (F)">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+       stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 3H5a2 2 0 0 0-2 2v3"/>
+    <path d="M16 3h3a2 2 0 0 1 2 2v3"/>
+    <path d="M8 21H5a2 2 0 0 1-2-2v-3"/>
+    <path d="M16 21h3a2 2 0 0 0 2-2v-3"/>
+  </svg>
+</button>
+
+<div id="nav" class="no-advance">
+  <button id="btnPrev" class="navbtn no-advance" aria-label="Slaid sebelumnya" title="Sebelumnya (←)">
+    <svg viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></svg>
+  </button>
+  <button id="btnOv" class="navbtn wide no-advance" aria-label="Gambaran keseluruhan slaid" title="Gambaran keseluruhan (O)">
+    <svg viewBox="0 0 24 24">
+      <rect x="3" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="3" width="7" height="7" rx="1.5"/>
+      <rect x="3" y="14" width="7" height="7" rx="1.5"/>
+      <rect x="14" y="14" width="7" height="7" rx="1.5"/>
+    </svg>
+  </button>
+  <button id="btnNext" class="navbtn no-advance" aria-label="Slaid seterusnya" title="Seterusnya (→)">
+    <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+  </button>
+</div>
+
+<div id="hint">Ketik di mana-mana · → · untuk maju</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var deck    = document.getElementById('deck');
+  var slides  = Array.prototype.slice.call(deck.querySelectorAll('.slide'));
+  var bar     = document.getElementById('bar');
+  var counter = document.getElementById('counter');
+  var hint    = document.getElementById('hint');
+  var fsBtn   = document.getElementById('fs');
+  var ov      = document.getElementById('overview');
+  var ovGrid  = document.getElementById('ovGrid');
+  var btnPrev = document.getElementById('btnPrev');
+  var btnNext = document.getElementById('btnNext');
+  var btnOv   = document.getElementById('btnOv');
+
+  var idx = 0;
+  var total = slides.length;
+  var ovBuilt = false;
+
+  function resize() {
+    var s = Math.min(window.innerWidth / 1600, window.innerHeight / 900);
+    deck.style.transform = 'translate(-50%,-50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', resize);
+  window.addEventListener('orientationchange', resize);
+  resize();
+
+  function show(n) {
+    n = Math.max(0, Math.min(total - 1, n));
+    idx = n;
+    slides.forEach(function (s, i) {
+      s.classList.toggle('active', i === idx);
+    });
+    counter.textContent = (idx + 1) + ' / ' + total;
+    bar.style.width = ((idx + 1) / total * 100) + '%';
+    if (ovBuilt) updateThumbActive();
+  }
+
+  function next() { if (idx < total - 1) { show(idx + 1); dismissHint(); } }
+  function prev() { if (idx > 0) { show(idx - 1); dismissHint(); } }
+
+  var hintGone = false;
+  function dismissHint() {
+    if (hintGone) return;
+    hintGone = true;
+    hint.classList.add('gone');
+  }
+
+  function buildOverview() {
+    slides.forEach(function (s, i) {
+      var t = document.createElement('button');
+      t.className = 'thumb no-advance';
+      t.setAttribute('aria-label', 'Pergi ke slaid ' + (i + 1));
+
+      var inner = document.createElement('div');
+      inner.className = 'thumb-inner';
+
+      var clone = s.cloneNode(true);
+      clone.classList.remove('active');
+      clone.style.opacity = '1';
+      clone.style.visibility = 'visible';
+      inner.appendChild(clone);
+      t.appendChild(inner);
+
+      var num = document.createElement('span');
+      num.className = 'thumb-num';
+      num.textContent = i + 1;
+      t.appendChild(num);
+
+      t.addEventListener('click', function (e) {
+        e.stopPropagation();
+        show(i);
+        closeOverview();
+      });
+
+      ovGrid.appendChild(t);
+    });
+    ovBuilt = true;
+  }
+
+  function updateThumbActive() {
+    var thumbs = ovGrid.children;
+    for (var i = 0; i < thumbs.length; i++) {
+      thumbs[i].classList.toggle('on', i === idx);
+    }
+  }
+
+  function openOverview() {
+    if (!ovBuilt) buildOverview();
+    updateThumbActive();
+    ov.classList.add('open');
+  }
+  function closeOverview() { ov.classList.remove('open'); }
+  function toggleOverview() {
+    ov.classList.contains('open') ? closeOverview() : openOverview();
+  }
+
+  btnPrev.addEventListener('click', function (e) { e.stopPropagation(); prev(); });
+  btnNext.addEventListener('click', function (e) { e.stopPropagation(); next(); });
+  btnOv.addEventListener('click', function (e) { e.stopPropagation(); toggleOverview(); });
+  [btnPrev, btnNext, btnOv].forEach(function (b) {
+    b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+  });
+
+  var startX = 0, startY = 0, startT = 0, moved = false;
+
+  document.addEventListener('pointerdown', function (e) {
+    startX = e.clientX;
+    startY = e.clientY;
+    startT = Date.now();
+    moved = false;
+  }, { passive: true });
+
+  document.addEventListener('pointermove', function (e) {
+    if (Math.abs(e.clientX - startX) > 12 || Math.abs(e.clientY - startY) > 12) {
+      moved = true;
+    }
+  }, { passive: true });
+
+  document.addEventListener('pointerup', function (e) {
+    if (ov.classList.contains('open')) return;
+
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+      if (dx < 0) { next(); } else { prev(); }
+      return;
+    }
+
+    if (e.target.closest && e.target.closest('.no-advance')) return;
+
+    if (!moved && (Date.now() - startT) < 600) {
+      next();
+    }
+  });
+
+  document.addEventListener('pointercancel', function () { moved = true; });
+
+  document.addEventListener('keydown', function (e) {
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case ' ':
+      case 'Spacebar':
+      case 'PageDown':
+      case 'Enter':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+      case 'PageUp':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); show(0); break;
+      case 'End':
+        e.preventDefault(); show(total - 1); break;
+      case 'o':
+      case 'O':
+        e.preventDefault(); toggleOverview(); break;
+      case 'Escape':
+        if (ov.classList.contains('open')) { e.preventDefault(); closeOverview(); }
+        break;
+      case 'f':
+      case 'F':
+        e.preventDefault(); toggleFullscreen(); break;
+    }
+  });
+
+  function toggleFullscreen() {
+    var el = document.documentElement;
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      var req = el.requestFullscreen || el.webkitRequestFullscreen || el.msRequestFullscreen;
+      if (req) req.call(el);
+    } else {
+      var exit = document.exitFullscreen || document.webkitExitFullscreen || document.msExitFullscreen;
+      if (exit) exit.call(document);
+    }
+  }
+  fsBtn.addEventListener('click', function (e) {
+    e.stopPropagation();
+    toggleFullscreen();
+  });
+  fsBtn.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+
+  setTimeout(dismissHint, 8000);
+
+  show(0);
+})();
+</script>
+</body>
+</html>
